@@ -31,13 +31,13 @@ export const fetchProtocolHistory = (id, days = 30) =>
 // ── Analytics ──────────────────────────────────────────────────────────────
 
 export const fetchSustainabilityReport = () =>
-  api.get('/api/analytics/dashboard')
+  api.get('/api/analytics/ecosystem/summary')
 
 export const fetchCompare = (ids) =>
   api.get('/api/analytics/compare', { params: { ids: ids.join(',') } })
 
 export const fetchEcosystemSummary = () =>
-  api.get('/api/analytics/dashboard')
+  api.get('/api/analytics/ecosystem/summary')
 
 // ── Alerts ─────────────────────────────────────────────────────────────────
 
