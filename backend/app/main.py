@@ -42,16 +42,14 @@ async def lifespan(app: FastAPI):
     await init_db()
     logger.info("database_initialized")
 
-    # Kick off an immediate data load, then schedule recurring refreshes
     scheduler.add_job(
         _run_pipeline_job,
         trigger=IntervalTrigger(minutes=settings.data_refresh_interval_minutes),
         id="data_pipeline",
         replace_existing=True,
-        next_run_time=datetime.now(timezone.utc),   # run immediately on start
+        next_run_time=datetime.now(timezone.utc),
     )
 
-    # Daily digest at 08:00 UTC
     from apscheduler.triggers.cron import CronTrigger
 
     async def _daily_digest_job():
@@ -94,30 +92,27 @@ def create_app() -> FastAPI:
     )
 
     # ── CORS ─────────────────────────────────────────────
-    # ── CORS ─────────────────────────────────────────────
-    origins = ["*"]
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=False,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-if settings.environment == "production":
-    origins = [
-        settings.frontend_url,
-        "https://frontend-theta-nine-77.vercel.app",
-        "https://frontend-fhfgbzvps-adewuys-projects.vercel.app",
-    ]
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    if settings.environment == "production":
+        origins = [
+            settings.frontend_url,
+            "https://frontend-theta-nine-77.vercel.app",
+            "https://frontend-fhfgbzvps-adewuys-projects.vercel.app",
+        ]
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+    else:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=False,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
     # ── Routers ──────────────────────────────────────────
     app.include_router(protocols.router)
