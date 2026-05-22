@@ -6,7 +6,6 @@ import ProtocolDetail from './pages/ProtocolDetail'
 import Compare from './pages/Compare'
 import Alerts from './pages/Alerts'
 import Settings from './pages/Settings'
-import TelegramButton from './components/TelegramButton'
 
 export default function App() {
   return (
@@ -29,7 +28,6 @@ export default function App() {
           <Route path="*"             element={<Dashboard />} />
         </Routes>
       </main>
-      <TelegramButton />
     </div>
   )
 }
