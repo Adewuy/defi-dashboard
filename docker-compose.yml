@@ -1,0 +1,70 @@
+version: '3.9'
+
+services:
+
+  # ── FastAPI Backend ───────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: defi_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:////data/defi_analytics.db
+      - REDIS_URL=redis://redis:6379
+      - ENVIRONMENT=production
+    env_file:
+      - ./backend/.env
+    volumes:
+      - db_data:/data
+    depends_on:
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── React Frontend (served via nginx) ────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://backend:8000
+    container_name: defi_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Telegram Bot ─────────────────────────────────────────────────────────
+  telegram_bot:
+    build:
+      context: ./telegram_bot
+      dockerfile: Dockerfile
+    container_name: defi_telegram_bot
+    environment:
+      - BACKEND_URL=http://backend:8000
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Redis (cache + task queue) ────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: defi_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  redis_data:
