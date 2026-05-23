@@ -1,6 +1,7 @@
+// src/hooks/useData.js   (or wherever this file is)
 import { useState, useEffect } from 'react';
 
-const API = 'http://localhost:8000';
+const API = 'https://sierra-tribune-flammable.ngrok-free.dev';
 
 function useFetch(url, interval = 0) {
   const [data, setData]      = useState(null);
