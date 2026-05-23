@@ -1,4 +1,3 @@
-// src/components/Sidebar.jsx
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useHealth } from '../hooks/useData';
@@ -15,111 +14,78 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: health } = useHealth();
 
-  const linkStyle = ({ isActive }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    padding: '10px 12px',
-    borderRadius: 8,
-    textDecoration: 'none',
-    fontSize: 14,
-    fontWeight: isActive ? 600 : 400,
-    color: isActive ? 'var(--accent)' : 'var(--text-muted)',
-    background: isActive ? 'var(--accent-faint)' : 'transparent',
-    transition: 'all 0.2s',
-  });
-
   return (
     <>
-      {/* Mobile Menu Button */}
+      {/* Mobile Hamburger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
           position: 'fixed',
           top: '15px',
           left: '15px',
-          zIndex: 1000,
-          padding: '8px 12px',
-          background: 'var(--card-bg)',
-          border: '1px solid var(--border)',
-          borderRadius: 8,
-          fontSize: 20,
-          display: 'none', // Hidden on desktop
-          '@media (max-width: 768px)': { display: 'block' }
+          zIndex: 2000,
+          padding: '10px',
+          fontSize: '24px',
+          background: 'white',
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         }}
+        className="md:hidden"
       >
         {isOpen ? '✕' : '☰'}
       </button>
 
       {/* Sidebar */}
       <aside style={{
-        width: 220,
-        minHeight: '100vh',
+        width: '240px',
+        height: '100vh',
         background: 'var(--sidebar-bg)',
         borderRight: '1px solid var(--border)',
-        padding: '1.5rem 0.75rem',
-        position: 'sticky',
+        padding: '20px 12px',
+        position: 'fixed',
+        left: 0,
         top: 0,
-        flexShrink: 0,
-        transition: 'transform 0.3s ease',
+        zIndex: 1000,
         transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
-        zIndex: 999,
-        // Mobile styles
-        '@media (max-width: 768px)': {
-          position: 'fixed',
-          height: '100vh',
-          width: '260px',
-        },
-        // Desktop styles
-        '@media (min-width: 769px)': {
-          transform: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-        }
-      }}>
-        {/* Logo */}
-        <div style={{ padding: '0 12px 1.5rem', borderBottom: '1px solid var(--border)', marginBottom: '1rem' }}>
-          <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>📈 DeFi Scan</div>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Sustainability Analytics</div>
+        transition: 'transform 0.3s ease',
+      }}
+      className="md:translate-x-0 md:static md:block"
+      >
+        <div style={{ marginBottom: '30px', padding: '0 12px' }}>
+          <div style={{ fontSize: '20px', fontWeight: '700' }}>📈 DeFi Scan</div>
+          <div style={{ fontSize: '12px', color: '#666' }}>Sustainability Analytics</div>
         </div>
 
-        {/* Nav links */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
-          {NAV.map(n => (
-            <NavLink 
-              key={n.to} 
-              to={n.to} 
-              end={n.to === '/'} 
-              style={linkStyle}
-              onClick={() => setIsOpen(false)} // Close on mobile after click
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          {NAV.map(item => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === '/'}
+              style={({ isActive }) => ({
+                padding: '12px 16px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                color: isActive ? '#4f46e5' : '#666',
+                background: isActive ? '#f0f0ff' : 'transparent',
+                fontWeight: isActive ? '600' : '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+              })}
+              onClick={() => setIsOpen(false)}
             >
-              <span style={{ fontSize: 16 }}>{n.icon}</span>
-              <span>{n.label}</span>
+              <span style={{ fontSize: '20px' }}>{item.icon}</span>
+              <span>{item.label}</span>
             </NavLink>
           ))}
         </nav>
-
-        {/* Status indicator */}
-        {health && (
-          <div style={{ padding: '12px', background: 'var(--card-bg)', borderRadius: 10, border: '1px solid var(--border)', marginTop: 'auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: health.status === 'ok' ? '#1D9E75' : '#E05252', display: 'inline-block' }} />
-              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>
-                {health.status === 'ok' ? 'System Online' : 'System Issue'}
-              </span>
-            </div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-              <div>📡 DeFiLlama: Active</div>
-              <div>💰 CoinGecko: Active</div>
-              <div>🤖 Telegram: {health.telegram_configured ? '✅' : '⚪ Not set'}</div>
-            </div>
-          </div>
-        )}
       </aside>
 
-      {/* Overlay for mobile */}
+      {/* Overlay */}
       {isOpen && (
-        <div 
+        <div
           onClick={() => setIsOpen(false)}
           style={{
             position: 'fixed',
@@ -128,10 +94,9 @@ export default function Sidebar() {
             right: 0,
             bottom: 0,
             background: 'rgba(0,0,0,0.5)',
-            zIndex: 998,
-            display: 'block',
-            '@media (min-width: 769px)': { display: 'none' }
+            zIndex: 999,
           }}
+          className="md:hidden"
         />
       )}
     </>
