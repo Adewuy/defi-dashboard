@@ -1,4 +1,4 @@
-// src/hooks/useData.js   (or wherever this file is)
+// src/hooks/useData.js
 import { useState, useEffect } from 'react';
 
 const API = 'https://sierra-tribune-flammable.ngrok-free.dev';
